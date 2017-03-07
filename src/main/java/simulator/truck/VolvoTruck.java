@@ -1,14 +1,22 @@
 package simulator.truck;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import simulator.container.IContainer;
-import simulator.container.OreContainer;
+import simulator.fsm.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 public final class VolvoTruck implements ITruck {
+  private final List<IStateMachine> processes = new ArrayList<>();
   private final Texture texture;
+  private final AssetManager assets;
+
   private final Vector2 position;
   private final Vector2 velocity;
   private final boolean flipped;
@@ -16,16 +24,32 @@ public final class VolvoTruck implements ITruck {
   private IContainer carrying;
 
   public VolvoTruck(Vector2 position, Vector2 velocity, boolean flipped, AssetManager assets) {
+    this.assets = assets;
     this.texture = assets.get("resources/volvo.png");
     this.position = position;
 
     this.velocity = velocity;
     this.flipped = flipped;
+
+    processes.add(new Repeat(new Sequence(new Wait(new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        return carrying != null && carrying.getCurrentAmount() == carrying.getMaxCapacity();
+      }
+    }), new Call(new IAction() {
+      @Override
+      public void run() {
+        position.set(position.x + (velocity.x * Gdx.graphics.getDeltaTime()), position.y);
+        carrying.getPosition().set(position.x, position.y + 15F);
+      }
+    }))));
   }
 
   @Override
   public void update(float deltaTime) {
-    // TODO
+    for (IStateMachine machine : processes) {
+      machine.update(deltaTime);
+    }
   }
 
   @Override
@@ -54,7 +78,7 @@ public final class VolvoTruck implements ITruck {
 
   private void drawContainer(SpriteBatch batch) {
     if (carrying != null) {
-
+      carrying.draw(batch);
     }
   }
 

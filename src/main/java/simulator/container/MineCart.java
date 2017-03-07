@@ -5,16 +5,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public final class ProductContainer implements IContainer {
+public final class MineCart implements IContainer {
   private final Texture texture;
   private final int capacity;
-
-  private int currentAmount;
+  private final int currentAmount;
   private Vector2 position;
 
-  public ProductContainer(int capacity, Vector2 position, AssetManager assets) {
-    this.texture = assets.get("resources/product_container.png");
+  public MineCart(int capacity, Vector2 position, AssetManager assets) {
+    this.texture = assets.get("resources/mine_cart.png");
     this.capacity = capacity;
+    this.currentAmount = capacity;
     this.position = position;
   }
 
@@ -30,7 +30,7 @@ public final class ProductContainer implements IContainer {
 
   @Override
   public void setCurrentAmount(int currentAmount) {
-    this.currentAmount = currentAmount;
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -40,12 +40,7 @@ public final class ProductContainer implements IContainer {
 
   @Override
   public boolean addContent(int amount) {
-    if ((currentAmount + amount) > capacity) {
-      return false;
-    }
-
-    currentAmount += amount;
-    return true;
+    throw new UnsupportedOperationException();
   }
 
   @Override

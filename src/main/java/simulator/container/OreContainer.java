@@ -20,7 +20,7 @@ public final class OreContainer implements IContainer {
 
   @Override
   public void draw(SpriteBatch batch) {
-    batch.draw(texture, position.x, position.y);
+    batch.draw(texture, position.x, position.y, texture.getWidth() / 4, texture.getHeight() / 4);
   }
 
   @Override

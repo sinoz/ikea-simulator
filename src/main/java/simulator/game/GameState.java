@@ -8,7 +8,10 @@ import simulator.component.IComponent;
 import simulator.factory.IFactory;
 import simulator.factory.IkeaFactory;
 import simulator.factory.MiningFactory;
-import simulator.fsm.*;
+import simulator.fsm.Call;
+import simulator.fsm.IAction;
+import simulator.fsm.IStateMachine;
+import simulator.fsm.Repeat;
 import simulator.truck.ITruck;
 
 import java.util.ArrayList;
@@ -30,8 +33,8 @@ public final class GameState implements IComponent {
         factory2 = new IkeaFactory(new Vector2(500, 70), assets);
 
         trucks = new ArrayList<>();
-
         processes = new ArrayList<>();
+
         processes.add(new Repeat(new Call(new AddTruckFromFactory(factory1, trucks))));
         processes.add(new Repeat(new Call(new AddTruckFromFactory(factory2, trucks))));
     }

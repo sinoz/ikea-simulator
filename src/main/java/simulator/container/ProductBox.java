@@ -5,15 +5,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public final class ProductContainer implements IContainer {
+public final class ProductBox implements IContainer {
   private final Texture texture;
   private final int capacity;
 
   private int currentAmount;
   private Vector2 position;
 
-  public ProductContainer(int capacity, Vector2 position, AssetManager assets) {
-    this.texture = assets.get("resources/product_container.png");
+  public ProductBox(int capacity, Vector2 position, AssetManager assets) {
+    this.texture = assets.get("resources/product_box.png");
     this.capacity = capacity;
     this.position = position;
   }
