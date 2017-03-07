@@ -5,15 +5,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import simulator.container.IContainer;
+import simulator.container.OreContainer;
 import simulator.container.ProductBox;
 import simulator.container.ProductContainer;
-import simulator.fsm.IAction;
-import simulator.fsm.IStateMachine;
+import simulator.fsm.*;
 import simulator.truck.ITruck;
 import simulator.truck.VolvoTruck;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public final class IkeaFactory implements IFactory {
   private final List<IStateMachine> processes = new ArrayList<>();
@@ -29,16 +31,52 @@ public final class IkeaFactory implements IFactory {
     this.position = position;
     this.texture = assets.get("resources/ikea.png");
 
-    // TODO
+    // fills the truck with shippable products
+    processes.add(new Repeat(new Sequence(new Wait(new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        return readyTruck != null && !productsToShip.isEmpty();
+      }
+    }), new Call(new FillReadyTruck()))));
+
+    // adds a new truck
+    processes.add(new Repeat(new Sequence(new Timer(3F), new Sequence(new Wait(new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        return readyTruck == null;
+      }
+    }), new Call(new AddReadyTruck())))));
+
+    // every second we add a new product box
+    processes.add(new Repeat(new Sequence(new Timer(1F), new Sequence(new Wait(new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        return productsToShip.size() != 6;
+      }
+    }), new Call(new AddProductBox())))));
   }
 
-  private final class AddProductContainer implements IAction {
+  private final class FillReadyTruck implements IAction {
     @Override
     public void run() {
-      float x = readyTruck.getPosition().x - 300;
-      float y = readyTruck.getPosition().y + 30;
+      if (readyTruck.getContainer() == null) {
+        float x = readyTruck.getPosition().x - 60F;
+        float y = readyTruck.getPosition().y + 15F;
 
-      readyTruck.addContainer(new ProductContainer(100, new Vector2(x, y), assets));
+        readyTruck.addContainer(new ProductContainer(100, new Vector2(x, y), assets));
+      }
+
+      Iterator<IContainer> itr = productsToShip.iterator();
+      while (itr.hasNext()) {
+        if (readyTruck.getContainer().addContent(itr.next().getCurrentAmount())) {
+          if (readyTruck.getContainer().getCurrentAmount() >= readyTruck.getContainer().getMaxCapacity()) {
+            readyTruck = null;
+            break;
+          }
+
+          itr.remove();
+        }
+      }
     }
   }
 
@@ -50,30 +88,23 @@ public final class IkeaFactory implements IFactory {
   }
 
   private final class AddProductBox implements IAction {
-    private final IkeaFactory ikea;
-
-    AddProductBox(IkeaFactory ikea) {
-      this.ikea = ikea;
-    }
-
     ProductBox createProductBox(Vector2 position) {
-      return new ProductBox(100, position, assets);
+      return new ProductBox(25, position, assets);
     }
 
     @Override
     public void run() {
-      float ikeaX = ikea.getPosition().x;
-      float ikeaY = ikea.getPosition().y;
+      float ikeaX = getPosition().x;
+      float ikeaY = getPosition().y;
 
       float boxX = ikeaX + 20F;
 
       // the C# version does mineY + (40 - 30 * size) because monogame's coordinate system
       // presumably starts at the top left corner whilst libgdx draws textures starting at the bottom left
-      float boxY = ikeaY + (40 + 40 * ikea.getProductsToShip().size());
+      float boxY = ikeaY + (40 + 40 * getProductsToShip().size());
 
       Vector2 position = new Vector2(boxX, boxY);
-
-      ikea.getProductsToShip().add(createProductBox(position));
+      getProductsToShip().add(createProductBox(position));
     }
   }
 

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import simulator.container.IContainer;
+import simulator.factory.IkeaFactory;
 import simulator.fsm.*;
 
 import java.util.ArrayList;
@@ -34,13 +35,15 @@ public final class VolvoTruck implements ITruck {
     processes.add(new Repeat(new Sequence(new Wait(new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
-        return carrying != null && carrying.getCurrentAmount() == carrying.getMaxCapacity();
+        return carrying != null && carrying.getCurrentAmount() >= carrying.getMaxCapacity();
       }
     }), new Call(new IAction() {
       @Override
       public void run() {
-        position.set(position.x + (velocity.x * Gdx.graphics.getDeltaTime()), position.y);
-        carrying.getPosition().set(position.x, position.y + 15F);
+        float toMove = (velocity.x * Gdx.graphics.getDeltaTime());
+
+        position.set(position.x + toMove, position.y);
+        carrying.getPosition().set(position.x - (flipped ? 60F : 0), position.y + 15F);
       }
     }))));
   }

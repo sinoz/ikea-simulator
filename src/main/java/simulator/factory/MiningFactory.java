@@ -67,13 +67,14 @@ public final class MiningFactory implements IFactory {
 
       Iterator<IContainer> itr = productsToShip.iterator();
       while (itr.hasNext()) {
-        readyTruck.getContainer().addContent(itr.next().getCurrentAmount());
-        if (readyTruck.getContainer().getCurrentAmount() == readyTruck.getContainer().getMaxCapacity()) {
-          readyTruck = null;
-          break;
-        }
+        if (readyTruck.getContainer().addContent(itr.next().getCurrentAmount())) {
+          if (readyTruck.getContainer().getCurrentAmount() >= readyTruck.getContainer().getMaxCapacity()) {
+            readyTruck = null;
+            break;
+          }
 
-        itr.remove();
+          itr.remove();
+        }
       }
     }
   }
