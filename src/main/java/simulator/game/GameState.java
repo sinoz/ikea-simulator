@@ -8,43 +8,39 @@ import simulator.component.IComponent;
 import simulator.factory.IFactory;
 import simulator.factory.IkeaFactory;
 import simulator.factory.MiningFactory;
-import simulator.fsm.Call;
-import simulator.fsm.IAction;
-import simulator.fsm.IStateMachine;
-import simulator.fsm.Repeat;
+import simulator.fsm.*;
 import simulator.truck.ITruck;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class GameState implements IComponent {
-    List<ITruck> trucks;
-    IFactory factory1;
-    IFactory factory2;
-    List<IStateMachine> processes;
+    private final List<ITruck> trucks;
 
-    Texture background;
+    private final IFactory factory1, factory2;
+
+    private final List<IStateMachine> processes;
+
+    private final Texture background;
 
     public GameState(AssetManager assets) {
-        this.background = assets.get("resources/background.png");
+        background = assets.get("resources/background.png");
 
-        // truck, mine, orebox, orecontainer
-        // truck, ikea, productbox, productcontainer
-        factory1 = new MiningFactory(new Vector2(100, 70), assets);//, new Dimension2D(150, 230/2), new Vector2(100,0), new Vector2(5,0), mine, oreContainer, mineCart, volvo);
-        factory2 = new IkeaFactory(new Vector2(600, 340), assets);//, new Dimension2D(150, 175/2), new Vector2(-100,0), new Vector2(-4,0), ikea, productContainer, productBox, volvo);
+        factory1 = new MiningFactory(new Vector2(50, 310), assets);
+        factory2 = new IkeaFactory(new Vector2(500, 70), assets);
 
         trucks = new ArrayList<>();
 
-        this.processes = new ArrayList<>();
-        this.processes.add(new Repeat(new Call(new AddTruckFromFactory(factory1, trucks))));
-        this.processes.add(new Repeat(new Call(new AddTruckFromFactory(factory2, trucks))));
+        processes = new ArrayList<>();
+        processes.add(new Repeat(new Call(new AddTruckFromFactory(factory1, trucks))));
+        processes.add(new Repeat(new Call(new AddTruckFromFactory(factory2, trucks))));
     }
 
-    class AddTruckFromFactory implements IAction {
+    private final class AddTruckFromFactory implements IAction {
         IFactory factory;
         List<ITruck> trucks;
 
-        public AddTruckFromFactory(IFactory factory, List<ITruck> trucks) {
+        AddTruckFromFactory(IFactory factory, List<ITruck> trucks) {
             this.factory = factory;
             this.trucks = trucks;
         }

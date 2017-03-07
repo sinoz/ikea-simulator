@@ -9,7 +9,7 @@ public class SimulatorApp {
   }
 
   private static class SimulatorConfig extends LwjglApplicationConfiguration {
-    public SimulatorConfig() {
+    SimulatorConfig() {
       configure();
     }
 

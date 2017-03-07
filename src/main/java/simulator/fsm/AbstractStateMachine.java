@@ -10,5 +10,4 @@ public abstract class AbstractStateMachine implements IStateMachine {
     public void setBusy(boolean busy) {
         isBusy = busy;
     }
-
 }

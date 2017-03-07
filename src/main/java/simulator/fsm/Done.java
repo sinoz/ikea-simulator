@@ -14,6 +14,4 @@ public class Done extends AbstractStateMachine {
     public void update(float deltaTime) {
         setBusy(false);
     }
-
-
 }

@@ -38,7 +38,7 @@ public final class SimulatorListener implements ApplicationListener {
 
   @Override
   public void render() {
-    Gdx.gl.glClearColor(0, 255F, 0, 1);
+    Gdx.gl.glClearColor(0, 255, 0, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
     gameState.update(Gdx.graphics.getDeltaTime());
@@ -58,5 +58,6 @@ public final class SimulatorListener implements ApplicationListener {
   @Override
   public void dispose() {
     batch.dispose();
+    assets.dispose();
   }
 }
