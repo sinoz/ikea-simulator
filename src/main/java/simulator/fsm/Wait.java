@@ -1,11 +1,11 @@
 package simulator.fsm;
 
-import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 
 public class Wait extends AbstractStateMachine {
-    Callable<Boolean> condition;
+    Predicate<Object> condition;
 
-    public Wait(Callable<Boolean> condition) {
+    public Wait(Predicate<Object> condition) {
         this.condition = condition;
     }
 
@@ -14,12 +14,8 @@ public class Wait extends AbstractStateMachine {
     }
 
     public void update(float deltaTime) {
-        try {
-            if(condition.call()){
-                setBusy(false);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (condition.test(null)){
+            setBusy(false);
         }
     }
 }

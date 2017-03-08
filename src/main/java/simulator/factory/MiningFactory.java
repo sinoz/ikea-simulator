@@ -14,7 +14,7 @@ import simulator.truck.VolvoTruck;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 
 public final class MiningFactory implements IFactory {
   private final List<IStateMachine> processes = new ArrayList<>();
@@ -31,25 +31,25 @@ public final class MiningFactory implements IFactory {
     this.texture = assets.get("resources/mine.png");
 
     // fills the truck with shippable products
-    processes.add(new Repeat(new Sequence(new Wait(new Callable<Boolean>() {
+    processes.add(new Repeat(new Sequence(new Wait(new Predicate<Object>() {
       @Override
-      public Boolean call() throws Exception {
+      public boolean test(Object o) {
         return readyTruck != null && !productsToShip.isEmpty();
       }
     }), new Call(new FillReadyTruck()))));
 
     // adds a new truck
-    processes.add(new Repeat(new Sequence(new Timer(3F), new Sequence(new Wait(new Callable<Boolean>() {
+    processes.add(new Repeat(new Sequence(new Timer(3F), new Sequence(new Wait(new Predicate<Object>() {
       @Override
-      public Boolean call() throws Exception {
+      public boolean test(Object o) {
         return readyTruck == null;
       }
     }), new Call(new AddReadyTruck())))));
 
     // every second we add a new mine cart
-    processes.add(new Repeat(new Sequence(new Timer(1F), new Sequence(new Wait(new Callable<Boolean>() {
+    processes.add(new Repeat(new Sequence(new Timer(1F), new Sequence(new Wait(new Predicate<Object>() {
       @Override
-      public Boolean call() throws Exception {
+      public boolean test(Object o) {
         return productsToShip.size() != 6;
       }
     }), new Call(new AddMineCart())))));

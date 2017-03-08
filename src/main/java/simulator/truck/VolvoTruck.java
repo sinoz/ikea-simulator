@@ -12,6 +12,7 @@ import simulator.fsm.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 
 public final class VolvoTruck implements ITruck {
   private final List<IStateMachine> processes = new ArrayList<>();
@@ -32,19 +33,16 @@ public final class VolvoTruck implements ITruck {
     this.velocity = velocity;
     this.flipped = flipped;
 
-    processes.add(new Repeat(new Sequence(new Wait(new Callable<Boolean>() {
+    processes.add(new Repeat(new Sequence(new Wait(new Predicate<Object>() {
       @Override
-      public Boolean call() throws Exception {
+      public boolean test(Object o) {
         return carrying != null && carrying.getCurrentAmount() >= carrying.getMaxCapacity();
       }
-    }), new Call(new IAction() {
-      @Override
-      public void run() {
-        float toMove = (velocity.x * Gdx.graphics.getDeltaTime());
+    }), new Call(() -> {
+      float toMove = (velocity.x * Gdx.graphics.getDeltaTime());
 
-        position.set(position.x + toMove, position.y);
-        carrying.getPosition().set(position.x - (flipped ? 60F : 0), position.y + 15F);
-      }
+      position.set(position.x + toMove, position.y);
+      carrying.getPosition().set(position.x - (flipped ? 60F : 0), position.y + 15F);
     }))));
   }
 
